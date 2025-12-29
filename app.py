@@ -1,8 +1,8 @@
 import streamlit as st
 from groq import Groq
 
-# ✅ तेरी सही Groq key
-client = Groq(api_key="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")
+# ✅ Streamlit Cloud secrets से key लेगा
+client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 st.set_page_config(page_title="Quick AI", page_icon="⚡")
 
@@ -49,3 +49,4 @@ if user_input:
 
     # Save assistant message
     st.session_state.messages.append({"role": "assistant", "content": answer})
+
