@@ -1,61 +1,41 @@
 import streamlit as st
 from groq import Groq
 
-# Safe secrets loading
-try:
-    GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
-    if not GROQ_API_KEY:
-        raise ValueError("API key missing")
-    client = Groq(api_key=GROQ_API_KEY)
-    st.success("✅ Quick AI Ready!")
-except Exception as e:
-    st.error(f"🚫 API Error: {str(e)}")
+st.title("🔧 Quick AI Setup Check")
+
+# Check secrets
+api_key = st.secrets.get("GROQ_API_KEY", "")
+st.write(f"**API Key Length:** {len(api_key)} chars")
+st.write(f"**API Key Starts With:** {api_key[:10]}..." if api_key else "**NO API KEY**")
+
+if len(api_key) < 20:
+    st.error("❌ **FIX: Add GROQ_API_KEY in Streamlit Secrets!**")
+    st.info("""
+    **How to fix:**
+    1. Go to [share.streamlit.io](https://share.streamlit.io)
+    2. Manage app → Settings → Secrets
+    3. Paste: `GROQ_API_KEY=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`
+    4. Save + Reboot
+    """)
     st.stop()
 
-st.set_page_config(page_title="Quick AI", page_icon="⚡")
+st.success("✅ **API Key OK!**")
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+# Test Groq connection
+if st.button("🧪 Test AI Connection"):
+    try:
+        client = Groq(api_key=api_key)
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": "Say 'Quick AI is working!'"}]
+        )
+        st.success("🚀 **Quick AI LIVE!**")
+        st.write(response.choices[0].message.content)
+    except Exception as e:
+        st.error(f"❌ Connection failed: {str(e)}")
 
-# Professional Header
-st.markdown("""
-    <div style='text-align: center; padding: 30px; background: linear-gradient(90deg, #4b6cb7, #182848); 
-                color: white; border-radius: 20px; margin: 20px 0;'>
-        <h1 style='font-size: 3em; margin: 0;'>⚡ Quick AI</h1>
-        <p style='font-size: 1.2em; opacity: 0.9;'>Super Fast AI Assistant</p>
-    </div>
-""", unsafe_allow_html=True)
+st.balloons()
 
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-
-user_input = st.chat_input("ASK ANY QUESTIONS...")
-
-if user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    with st.chat_message("user"):
-        st.markdown(user_input)
-
-    with st.chat_message("assistant"):
-        placeholder = st.empty()
-        placeholder.markdown("Thinking... ⚡")
-
-        try:
-            response = client.chat.completions.create(
-                model="llama-3.1-8b-instant",
-                messages=[
-                    {"role": "system", "content": "You are Quick AI. Answer shortly in simple Hindi-English mix."},
-                    {"role": "user", "content": user_input}
-                ]
-            )
-            answer = response.choices[0].message.content
-            placeholder.markdown(answer)
-        except Exception as e:
-            answer = f"Error: {str(e)}"
-            placeholder.markdown(answer)
-
-    st.session_state.messages.append({"role": "assistant", "content": answer})
 
 
 
