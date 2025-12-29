@@ -15,7 +15,7 @@ st.markdown("""
     <div style='text-align: center; padding: 30px; background: linear-gradient(90deg, #4b6cb7, #182848); 
                 color: white; border-radius: 20px; margin: 20px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);'>
         <h1 style='font-size: 3.5em; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>⚡ Quick AI</h1>
-        <p style='font-size: 1.4em; opacity: 0.95;'>Super Fast AI Assistant | Powered by Groq</p>
+        <p style='font-size: 1.4em; opacity: 0.95;'>Super Fast AI Assistant |</p>
     </div>
 """, unsafe_allow_html=True)
 
@@ -65,6 +65,7 @@ if user_input:
 # Footer
 st.markdown("---")
 st.markdown("<p style='text-align: center; color: #666; font-size: 0.9em;'>Made with ❤️ by <a href='https://github.com/rounakofficial111-cmd'>rounakofficial111-cmd</a> | Powered by Groq & Streamlit</p>", unsafe_allow_html=True)
+
 
 
 
