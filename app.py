@@ -1,40 +1,70 @@
 import streamlit as st
 from groq import Groq
 
-st.title("🔧 Quick AI Setup Check")
+# ✅ Connection (already working!)
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+client = Groq(api_key=GROQ_API_KEY)
 
-# Check secrets
-api_key = st.secrets.get("GROQ_API_KEY", "")
-st.write(f"**API Key Length:** {len(api_key)} chars")
-st.write(f"**API Key Starts With:** {api_key[:10]}..." if api_key else "**NO API KEY**")
+st.set_page_config(page_title="Quick AI", page_icon="⚡")
 
-if len(api_key) < 20:
-    st.error("❌ **FIX: Add GROQ_API_KEY in Streamlit Secrets!**")
-    st.info("""
-    **How to fix:**
-    1. Go to [share.streamlit.io](https://share.streamlit.io)
-    2. Manage app → Settings → Secrets
-    3. Paste: `GROQ_API_KEY=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`
-    4. Save + Reboot
-    """)
-    st.stop()
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-st.success("✅ **API Key OK!**")
+# 🎨 Professional Header + Logo Effect
+st.markdown("""
+    <div style='text-align: center; padding: 30px; background: linear-gradient(90deg, #4b6cb7, #182848); 
+                color: white; border-radius: 20px; margin: 20px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);'>
+        <h1 style='font-size: 3.5em; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>⚡ Quick AI</h1>
+        <p style='font-size: 1.4em; opacity: 0.95;'>Super Fast AI Assistant | Powered by Groq</p>
+    </div>
+""", unsafe_allow_html=True)
 
-# Test Groq connection
-if st.button("🧪 Test AI Connection"):
-    try:
-        client = Groq(api_key=api_key)
+# Sidebar Info
+with st.sidebar:
+    st.markdown("### 🚀 Quick AI")
+    st.markdown("**Status:** ✅ LIVE")
+    st.markdown("**Model:** Llama3.1 8B Instant")
+    st.markdown("**Speed:** Lightning Fast ⚡")
+    st.markdown("---")
+    st.markdown("[⭐ Star on GitHub](https://github.com/rounakofficial111-cmd/QUICK-AI)")
+
+# Chat History
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
+
+# Chat Input
+user_input = st.chat_input("💭 Ask anything... (Hindi/English)")
+
+if user_input:
+    # User message
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    with st.chat_message("user"):
+        st.markdown(user_input)
+
+    # AI Response
+    with st.chat_message("assistant"):
+        placeholder = st.empty()
+        placeholder.markdown("**Thinking... ⚡**")
+        
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
-            messages=[{"role": "user", "content": "Say 'Quick AI is working!'"}]
+            messages=[
+                {"role": "system", "content": "You are Quick AI. Super fast, friendly AI assistant. Answer in simple Hindi-English mix. Be helpful and conversational."},
+                {"role": "user", "content": user_input}
+            ],
+            temperature=0.7,
+            max_tokens=500
         )
-        st.success("🚀 **Quick AI LIVE!**")
-        st.write(response.choices[0].message.content)
-    except Exception as e:
-        st.error(f"❌ Connection failed: {str(e)}")
+        answer = response.choices[0].message.content
+        placeholder.markdown(answer)
 
-st.balloons()
+    # Save AI message
+    st.session_state.messages.append({"role": "assistant", "content": answer})
+
+# Footer
+st.markdown("---")
+st.markdown("<p style='text-align: center; color: #666; font-size: 0.9em;'>Made with ❤️ by <a href='https://github.com/rounakofficial111-cmd'>rounakofficial111-cmd</a> | Powered by Groq & Streamlit</p>", unsafe_allow_html=True)
 
 
 
